@@ -44,8 +44,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             ToDoAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    HomeScreen()
-
+                   // HomeScreen()
+                    AddItemScreen(modifier = Modifier
+                        .padding(innerPadding))
                 }
             }
         }
