@@ -45,8 +45,9 @@ class MainActivity : ComponentActivity() {
             ToDoAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                    // HomeScreen()
-                    AddItemScreen(modifier = Modifier
-                        .padding(innerPadding))
+                   /* AddItemScreen(modifier = Modifier
+                        .padding(innerPadding))*/
+                    ToDoListScreen(Modifier.padding(innerPadding))
                 }
             }
         }
