@@ -28,6 +28,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.getValue
 
 import com.pes.todoapp.ui.theme.ToDoAppTheme
 
@@ -36,6 +54,7 @@ class MainActivity : ComponentActivity() {
     val TAG = "MainActivity"
 
     // one time execution
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate called")
@@ -43,11 +62,72 @@ class MainActivity : ComponentActivity() {
         // setContent - API - sets UI content for the screen/activity
         setContent {
             ToDoAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                   // HomeScreen()
-                   /* AddItemScreen(modifier = Modifier
-                        .padding(innerPadding))*/
-                    ToDoListScreen(Modifier.padding(innerPadding))
+                //Step-I Creating NavigationHostController
+                val navC = rememberNavController()
+                val navBackStackEntry by navC.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
+                Scaffold(
+
+                    modifier = Modifier.fillMaxSize(),
+
+                    floatingActionButton = {
+                        FloatingActionButton(onClick = {
+                            navC.navigate("add_item")
+                        }) {
+                            Icon(Icons.Default.Add, contentDescription = "Add")
+                        }
+                    },
+                    topBar = {
+                        TopAppBar(
+                            title = { Text("TodoApp") },
+                            navigationIcon = {
+                                IconButton(onClick = {navC.popBackStack()}) {
+                                    Icon(Icons.Default.ArrowBack, "back")
+                                }
+                            }
+
+                        )
+                    },
+                    bottomBar = {
+                        NavigationBar {
+                            NavigationBarItem(
+                                selected = currentRoute == "home",
+                                onClick = { navC.navigate("home") { launchSingleTop = true } },
+                                icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                                label = { Text("Home") }
+                            )
+                            NavigationBarItem(
+                                selected = currentRoute == "todo_list",
+                                onClick = { navC.navigate("todo_list") { launchSingleTop = true } },
+                                icon = { Icon(Icons.Default.Settings, contentDescription = "Todo List") },
+                                label = { Text("Todo List") }
+                            )
+                            NavigationBarItem(
+                                selected = currentRoute == "add_item",
+                                onClick = { navC.navigate("add_item") { launchSingleTop = true } },
+                                icon = { Icon(Icons.Default.Add, contentDescription = "Add Item") },
+                                label = { Text("Add Item") }
+                            )
+                        }
+                    }
+
+
+                ) { innerPadding ->
+                    NavHost(
+                        navController = navC,
+                        startDestination = "home"
+                    ) {
+                        composable("todo_list") {
+                            ToDoListScreen(Modifier.padding(innerPadding))
+                        }
+                        composable("home") {
+                            HomeScreen(Modifier.padding(innerPadding))
+                        }
+                        composable("add_item") {
+                            AddItemScreen(Modifier.padding(innerPadding))
+                        }
+                    }
                 }
             }
         }
