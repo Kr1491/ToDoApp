@@ -1,6 +1,8 @@
 package com.pes.todoapp
 
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 
@@ -41,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -144,9 +147,18 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyTopAppBar(modifier: Modifier = Modifier,
                 navController: NavHostController) {
+    val ctx = LocalContext.current
+
     TopAppBar(title = { Text("ToDoApp") },
           actions = {
-              IconButton(onClick = {}) {
+              IconButton(onClick = {
+                  // launch ProfileActivity - use Explicit Intent
+                  val profileIntent = Intent(ctx,
+                      ProfileActivity::class.java)
+
+                  ctx.startActivity(profileIntent)
+
+              }) {
                   Icon(Icons.Default.Person,
                       contentDescription = "Profile")
               }
