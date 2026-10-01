@@ -24,10 +24,14 @@ class ContactUsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val userEmail = intent.getStringExtra("email")
+
         setContent {
             ToDoAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    ContactUsContent(modifier = Modifier.padding(innerPadding))
+                    ContactUsContent(modifier = Modifier.padding(innerPadding),
+                        userEmail)
                 }
             }
         }
@@ -35,14 +39,14 @@ class ContactUsActivity : ComponentActivity() {
 }
 
 @Composable
-fun ContactUsContent(modifier: Modifier = Modifier) {
+fun ContactUsContent(modifier: Modifier = Modifier, emailId: String?) {
 
     val ctx = LocalContext.current
     Column(modifier= modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
         ) {
-        Text("Hello User")
+        Text("Hello ${emailId ?: "User"}")
         Button(onClick = {
             // make call - Implicit intent
             val callIntent = Intent(Intent.ACTION_DIAL,
@@ -82,6 +86,6 @@ fun ContactUsContent(modifier: Modifier = Modifier) {
 @Composable
 fun GreetingPreview3() {
     ToDoAppTheme {
-        ContactUsContent()
+        ContactUsContent(emailId = "demo@test.com")
     }
 }

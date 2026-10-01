@@ -1,17 +1,27 @@
 package com.pes.todoapp
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
@@ -27,7 +37,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,6 +70,14 @@ fun ProfileContent(modifier: Modifier = Modifier) {
     }
 
     val ctx = LocalContext.current
+    var picUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickVisualMedia()) { result ->
+        picUri = result
+    }
 
     Column(modifier = modifier.fillMaxSize()
         .background(Color.LightGray),
@@ -64,10 +86,32 @@ fun ProfileContent(modifier: Modifier = Modifier) {
 
         Text("User Profile", fontSize = 30.sp)
 
-        Box(modifier = Modifier.size(150.dp)){
-            Icon(imageVector = Icons.Default.Person,
-                modifier = Modifier.size(140.dp),
-                contentDescription = "Default image")
+        Box(modifier = Modifier.size(150.dp)
+            .border(2.dp, Color.Black, CircleShape)
+            .clip(CircleShape)
+            .clickable(onClick = {
+                // Open Photo Gallery
+                launcher.launch(
+                    PickVisualMediaRequest(
+                        ActivityResultContracts.PickVisualMedia.ImageOnly))
+            }),
+            contentAlignment = Alignment.Center
+        ){
+            if (picUri == null)
+                Icon(imageVector = Icons.Default.Person,
+                    modifier = Modifier.size(140.dp),
+                    contentDescription = "Default image")
+            else {
+                val photoBmp = MediaStore.Images.Media.getBitmap(
+                    ctx.contentResolver,
+                    picUri
+                )
+                Image(bitmap = photoBmp!!.asImageBitmap(),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(140.dp),
+                    contentScale = ContentScale.Crop)
+            }
         }
         Text("Tap Image to change")
         OutlinedTextField(emailID,
@@ -82,6 +126,8 @@ fun ProfileContent(modifier: Modifier = Modifier) {
             // launch ContactUsActivity
             val i = Intent(ctx,
                 ContactUsActivity::class.java)
+            i.putExtra("email", emailID )
+
             ctx.startActivity(i)
         }) {
             Text("Contact Us", fontSize = 25.sp)
