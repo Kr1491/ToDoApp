@@ -25,16 +25,34 @@
         </activity>
         <activity
             android:name=".ProfileActivity"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/title_activity_profile"
             android:theme="@style/Theme.ToDoApp"
-            android:windowSoftInputMode="adjustResize" />
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ContactUsActivity"
             android:exported="false"
             android:label="@string/title_activity_contact_us"
             android:theme="@style/Theme.ToDoApp"
             android:windowSoftInputMode="adjustResize" />
+
+        <receiver
+            android:name=".MyReceiver"
+            android:enabled="true"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.LOCALE_CHANGED"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

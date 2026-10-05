@@ -1,8 +1,13 @@
 package com.pes.todoapp
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -21,9 +26,46 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.pes.todoapp.ui.theme.ToDoAppTheme
 
 class ContactUsActivity : ComponentActivity() {
+
+    val receiver = object: BroadcastReceiver() {
+        override fun onReceive(ctx: Context?, p1: Intent?) {
+
+            if(p1?.action == Intent.ACTION_AIRPLANE_MODE_CHANGED){
+                val isOn = p1.getBooleanExtra("state",
+                    false)
+
+                if (isOn){
+                    Toast.makeText(ctx, "Airplane mode is ON",
+                        Toast.LENGTH_LONG ).show()
+                    Log.d("ContactUsActivity", "Airplane mode is ON")
+                }else {
+                    Toast.makeText(ctx, "Airplane mode is OFF",
+                        Toast.LENGTH_LONG ).show()
+                    Log.d("ContactUsActivity", "Airplane mode is OFF")
+                }
+            } else if (p1?.action == Intent.ACTION_BATTERY_LOW) {
+                Log.d("ContactUsActivity", "BATTERY LOW")
+                Toast.makeText(ctx, "BATTERY LOW",
+                    Toast.LENGTH_LONG).show()
+            }
+        }
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(receiver)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        // register receiver
+        val filter = IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED)
+        registerReceiver(receiver, filter)
+
+        val filter1 = IntentFilter(Intent.ACTION_BATTERY_LOW)
+        registerReceiver(receiver, filter1)
 
         val userEmail = intent.getStringExtra("email")
 
