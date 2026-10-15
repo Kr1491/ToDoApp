@@ -1,10 +1,12 @@
 package com.pes.todoapp
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -31,6 +33,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -77,6 +80,24 @@ fun ProfileContent(modifier: Modifier = Modifier) {
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()) { result ->
         picUri = result
+    }
+
+    DisposableEffect(ctx) {
+        val pref = ctx.getSharedPreferences("profile",
+            Context.MODE_PRIVATE)
+
+        // read from shared pref
+        val savedEmail = pref.getString("user_email", "")
+        emailID = savedEmail ?: ""
+
+        onDispose {
+            // executed when leaving composition
+            // write to shared pref
+           val editor = pref.edit()
+            editor.putString("user_email", emailID)
+            editor.apply()
+            Log.d("ProfileActivity", "Data saved")
+        }
     }
 
     Column(modifier = modifier.fillMaxSize()
