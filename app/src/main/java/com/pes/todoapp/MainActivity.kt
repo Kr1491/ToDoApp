@@ -62,8 +62,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.pes.todoapp.db.TodoDatabase
+import com.pes.todoapp.db.TodoItem
 
 import com.pes.todoapp.ui.theme.ToDoAppTheme
+import kotlin.concurrent.thread
 
 class MainActivity : ComponentActivity() {
 
@@ -73,6 +76,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate called")
+
+        // to test
+        val dao = TodoDatabase.getInstance(this)?.getDao()
+        thread {
+            dao?.addItem(TodoItem(1,
+                "xyz",
+                "high",
+                true))
+        }
         enableEdgeToEdge()
         // setContent - API - sets UI content for the screen/activity
         setContent {
